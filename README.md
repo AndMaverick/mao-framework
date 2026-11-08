@@ -84,3 +84,9 @@ Version 0.1. The core is small on purpose. Model and action implementations are 
 ## Author
 
 Built by [AndMaverick](https://www.andmaverick.com). MIT licensed.
+
+---
+
+**Related reading:** [Nobody Signs for the Agent](https://blog.andmaverick.com/nobody-signs-for-the-agent?utm_source=github&utm_medium=repo&utm_campaign=mao-framework)
+
+**If this is your problem.** If a system you run can fail in ways that matter, the controls belong in the architecture, not in the postmortem. I am happy to talk through yours. [Begin a conversation](https://calendly.com/andmaverick?utm_source=github&utm_medium=repo&utm_campaign=mao-framework).
