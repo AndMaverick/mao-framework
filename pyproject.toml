@@ -1,15 +1,38 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "mao-framework"
-version = "0.1.0"
+version = "0.2.0"
 description = "Model, Action, Orchestration: a dependency-free framework for governed AI systems."
 readme = "README.md"
 requires-python = ">=3.9"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "AndMaverick LLC" }]
 
 [tool.setuptools.packages.find]
 include = ["mao*"]
+
+[tool.setuptools.package-data]
+mao = ["py.typed"]
+
+[project.scripts]
+mao = "mao.__main__:main"
+
+[tool.ruff]
+line-length = 140
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "C4", "SIM"]
+ignore = ["E501", "UP006", "UP007", "UP035", "UP045", "SIM108", "B010"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["SIM115", "B023", "E731", "B017"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+files = ["mao"]
