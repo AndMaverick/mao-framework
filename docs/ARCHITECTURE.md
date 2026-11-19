@@ -57,6 +57,14 @@ Each entry stores the previous entry's hash. `check()` returns a `Verification` 
 
 `Tracer` records spans with durations, cost and errors. With `Orchestrator(tracer=...)` a run is a root span and each executed step a child span carrying its metered cost, so `total_cost()` equals the run's spend and `critical_path()` shows where the time went. `Router` is UCB1 with reward `quality - cost_weight * cost`. The registry and policy decide what is permitted. The router chooses among the permitted by what has paid off, and it is deterministic.
 
+## Plans, assurance, context and prompts (`mao.playbook`, `mao.assure`, `mao.context`, `mao.vault`)
+
+A playbook is a markdown runbook. `compile_playbook` parses it, `lint_playbook` checks it, and `playbook_to_spec` turns it into a plan. A `Plan` is a validated DAG with per-step cost, latency and approval declarations. Its critical path is the longest latency chain, and `audit` compares what the plan says needs approval with what the `Policy` will enforce, so a gate on paper cannot silently be absent in the run.
+
+`assure` treats a model change like a code change. A `Suite` is scored by named scorers returning values in [0, 1]. `gate(baseline, candidate)` fails when a mean drops more than `max_drop`, and lists cases that went from passing to failing even when the mean held. Drift uses the population stability index (bins from baseline quantiles, 0.1 and 0.25 as the conventional thresholds), the Kolmogorov-Smirnov statistic, and a categorical PSI. The incident register scores impact x likelihood x (6 - detectability), maps the score to SEV1 to SEV4 and an SLA window, and reports breaches and mean time to resolve.
+
+`pack` selects chunks greedily by score minus a diversity penalty (token overlap with what is already chosen) until the budget is spent. Pinned chunks are placed first and must fit. `PromptVault` stores prompt versions by content digest, never rewrites history (rollback is a new version), and gates deploys on a caller-supplied check. Each change is an `AuditLog` event.
+
 ## What MAO does not do
 
 It does not call models, sandbox code, or inspect what an action actually does. Policy is only as good as the scope and risk labels you assign. See `THREAT-MODEL.md`.

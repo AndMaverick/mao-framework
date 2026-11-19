@@ -80,6 +80,7 @@ Every item here was a reproduced defect or a missing control in 0.1. See the [CH
 - Usage adapters for Anthropic, OpenAI, DeepSeek, Moonshot (Kimi) and Google Gemini, so spend is counted the same way whichever lab served the call.
 - `mao.guard` redacts personal data and scores prompt injection, with checksum-validated card and IBAN detection and Arabic and Persian digit handling. It is a heuristic filter, not a boundary, and plugs in as a step verifier.
 - `mao.trace` gives every run a span tree with cost attached to the step that incurred it. `mao.router` learns which permitted model earns its price on your traffic.
+- `mao.playbook` compiles markdown runbooks into plans with a critical path, and audits the plan's approval gates against the policy that will actually run. `mao.assure` holds eval suites, a regression gate that names the cases that flipped, drift statistics and an incident register with SLA tracking. `mao.context` packs retrieved chunks into a token budget. `mao.vault` versions prompts with gated deploys and an audit trail.
 - `mao export` writes the usage record as a CSV that [Token Ledger](https://github.com/AndMaverick/token-ledger) can analyse.
 
 ## Reference scenario
