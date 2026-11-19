@@ -99,7 +99,7 @@ python -m unittest discover -s tests -t .
 ruff check . && mypy
 ```
 
-117 tests, including adversarial ones that try to defeat each control: hostile approvers and verifiers, retry storms, tampered, truncated and rewritten logs, malformed entries, unpriceable usage, and formula injection in exports. CI runs Python 3.9 to 3.13, plus lint and strict type checking.
+185 tests, including adversarial ones that try to defeat each control: hostile approvers and verifiers, retry storms, tampered, truncated and rewritten logs, malformed entries, unpriceable usage, and formula injection in exports. CI runs Python 3.9 to 3.13, plus lint and strict type checking.
 
 ## Status
 
