@@ -1,5 +1,6 @@
 """MAO: Model, Action, Orchestration. A small, dependency-free framework for governed AI systems."""
 
+from . import compliance, lingua, sovereign
 from .action import Action, Decision, Policy
 from .adapters import (
     usage_from,
@@ -25,9 +26,10 @@ from .trace import Span, Tracer
 from .usage import MissingPrice, PriceBook, Usage
 from .vault import PromptVault
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 __all__ = [
+    "compliance", "lingua", "sovereign",
     "Action", "AuditLog", "Case", "Chunk", "ContentPolicy", "Decision", "MissingPrice", "ModelRegistry", "ModelSpec",
     "NoModelError", "Orchestrator", "Plan", "Policy", "PriceBook", "PromptVault", "QUESTIONS", "Register", "Router",
     "RunResult", "Span", "SpecError", "Step", "Suite",

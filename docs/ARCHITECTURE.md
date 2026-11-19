@@ -65,6 +65,14 @@ A playbook is a markdown runbook. `compile_playbook` parses it, `lint_playbook` 
 
 `pack` selects chunks greedily by score minus a diversity penalty (token overlap with what is already chosen) until the budget is spent. Pinned chunks are placed first and must fit. `PromptVault` stores prompt versions by content digest, never rewrites history (rollback is a new version), and gates deploys on a caller-supplied check. Each change is an `AuditLog` event.
 
+## International layer (`mao.sovereign`, `mao.lingua`, `mao.compliance`)
+
+Residency rules map a data class to the jurisdictions where it may be processed. A flow is checked at both ends, since data is processed where it leaves as well as where it lands. Two mechanisms prevent the common gaps. A derived class inherits the rules of what it contains, so a retrieval prompt assembled from personal data cannot be sent somewhere personal data cannot go. A class with no rule is reported by `unclassified`, because a flow that is unrestricted only by omission is how residency gaps start.
+
+`lingua` is the mundane layer that makes regional input usable. Arabic text is normalised so one word written several ways matches itself. Money is parsed with `Decimal`, never float, and an amount without a stated currency raises. Indonesian slang is a small reviewable table, and words outside it, including names, pass through untouched.
+
+`compliance` separates three states: met, missing and failed. A control is only as good as its evidence, so `runtime_evidence` takes audit logging from a log whose hash chain verifies and human oversight from a policy approval gate that the log shows was exercised. A claim that cannot be checked against the run stays a claim in the metadata, and the metadata is what a person typed.
+
 ## What MAO does not do
 
 It does not call models, sandbox code, or inspect what an action actually does. Policy is only as good as the scope and risk labels you assign. See `THREAT-MODEL.md`.
