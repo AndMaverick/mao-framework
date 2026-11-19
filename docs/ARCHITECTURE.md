@@ -47,7 +47,7 @@ Each entry stores the previous entry's hash. `check()` returns a `Verification` 
 
 ## Cost accounting (`mao.usage`, `mao.adapters`, `mao.export`)
 
-`Usage` uses the same token semantics as Token Ledger: `input_tokens` is uncached input only, cached reads and cache writes are separate, output includes reasoning. `usage_from_anthropic` and `usage_from_openai` read a provider response's usage block. They are duck-typed and tested against documented response shapes, not against live API calls. `write_usage_csv` turns the audit log into a CSV that `python -m tokenledger analyze --usage` reads, with estimated rows flagged.
+`Usage` uses the same token semantics as Token Ledger: `input_tokens` is uncached input only, cached reads and cache writes are separate, output includes reasoning. `usage_from_anthropic`, `usage_from_openai`, `usage_from_deepseek`, `usage_from_moonshot` and `usage_from_gemini` read a provider response's usage block, and `usage_from(provider, response)` dispatches by name. Providers disagree about whether input includes cached tokens and where reasoning is counted, so each adapter normalises to the same shape and raises when counts contradict each other. They are duck-typed and tested against documented response shapes, not against live API calls. `write_usage_csv` turns the audit log into a CSV that `python -m tokenledger analyze --usage` reads, with estimated rows flagged.
 
 ## What MAO does not do
 
