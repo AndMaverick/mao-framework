@@ -78,6 +78,8 @@ Every item here was a reproduced defect or a missing control in 0.1. See the [CH
 - A side-effecting step is attempted once unless you declare it idempotent. Duplicate payments from retries after an ambiguous failure are the failure this prevents.
 - The audit log detects edits, deletions and reordering on its own, and detects full rewrites and truncation against a stored anchor.
 - Usage adapters for Anthropic, OpenAI, DeepSeek, Moonshot (Kimi) and Google Gemini, so spend is counted the same way whichever lab served the call.
+- `mao.guard` redacts personal data and scores prompt injection, with checksum-validated card and IBAN detection and Arabic and Persian digit handling. It is a heuristic filter, not a boundary, and plugs in as a step verifier.
+- `mao.trace` gives every run a span tree with cost attached to the step that incurred it. `mao.router` learns which permitted model earns its price on your traffic.
 - `mao export` writes the usage record as a CSV that [Token Ledger](https://github.com/AndMaverick/token-ledger) can analyse.
 
 ## Reference scenario
@@ -95,7 +97,7 @@ python -m unittest discover -s tests -t .
 ruff check . && mypy
 ```
 
-89 tests, including adversarial ones that try to defeat each control: hostile approvers and verifiers, retry storms, tampered, truncated and rewritten logs, malformed entries, unpriceable usage, and formula injection in exports. CI runs Python 3.9 to 3.13, plus lint and strict type checking.
+117 tests, including adversarial ones that try to defeat each control: hostile approvers and verifiers, retry storms, tampered, truncated and rewritten logs, malformed entries, unpriceable usage, and formula injection in exports. CI runs Python 3.9 to 3.13, plus lint and strict type checking.
 
 ## Status
 
