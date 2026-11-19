@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import nullcontext
 from dataclasses import dataclass, field
 from graphlib import CycleError, TopologicalSorter
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -9,6 +10,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 from .action import Action, Policy
 from .audit import AuditLog
 from .model import ModelRegistry, ModelSpec, NoModelError
+from .trace import Tracer
 from .usage import MissingPrice, PriceBook, Usage
 
 
@@ -64,7 +66,8 @@ class Orchestrator:
 
     def __init__(self, registry: ModelRegistry, policy: Policy, audit: Optional[AuditLog] = None,
                  approver: Optional[Callable[[Step], Any]] = None, budget: Optional[float] = None,
-                 prices: Optional[PriceBook] = None, workload: str = "mao", team: str = "(unassigned)") -> None:
+                 prices: Optional[PriceBook] = None, workload: str = "mao", team: str = "(unassigned)",
+                 tracer: Optional[Tracer] = None) -> None:
         self.registry = registry
         self.policy = policy
         self.audit = audit if audit is not None else AuditLog()
@@ -73,8 +76,19 @@ class Orchestrator:
         self.prices = prices
         self.workload = workload
         self.team = team
+        self.tracer = tracer
 
     def run(self, steps: Any, inputs: Any = None) -> RunResult:
+        """Run a plan. With a ``tracer``, the run is a root span and each executed step is a child span."""
+        if self.tracer is None:
+            return self._run(steps, inputs)
+        with self.tracer.span("run", workload=self.workload, team=self.team) as span:
+            result = self._run(steps, inputs)
+            if not result.ok:
+                span.error = result.reason
+            return result
+
+    def _run(self, steps: Any, inputs: Any = None) -> RunResult:
         steps = list(steps)
         by_id = {s.id: s for s in steps}
         if len(by_id) != len(steps):
@@ -110,7 +124,12 @@ class Orchestrator:
                 return self._halt(outputs, state, step_id, "approval denied")
 
             ctx = {"inputs": inputs, "deps": {d: outputs[d] for d in step.depends_on}, "model": model.name}
-            result, error = self._execute(step, ctx, model, state)
+            before = state.spend
+            with (self.tracer.span(step_id, model=model.name) if self.tracer else nullcontext()) as step_span:
+                result, error = self._execute(step, ctx, model, state)
+                if step_span is not None:
+                    step_span.cost = state.spend - before
+                    step_span.error = error
             if error:
                 return self._halt(outputs, state, step_id, error)
             outputs[step_id] = result
