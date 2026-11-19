@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import FrozenSet, Iterable
 
 
 class NoModelError(LookupError):
@@ -15,14 +16,19 @@ class ModelSpec:
 
     risk_tier is the highest task risk (1 low, 2 medium, 3 high) the model is
     cleared to handle. A model cleared for tier 2 may serve tier 1 and 2 tasks.
+
+    cost_per_1k is dollars per 1,000 tokens. It ranks models for routing, and it is the flat charge for an
+    attempt that reports no usage. The orchestrator also reserves one such charge as headroom before each
+    attempt, so keep it in the same unit as your budget.
     """
 
     name: str
-    capabilities: frozenset
+    capabilities: FrozenSet[str]
     cost_per_1k: float
     p50_latency_ms: int
     risk_tier: int
     context_window: int = 8192
+    provider: str = "unknown"
 
     def __post_init__(self) -> None:
         if self.risk_tier not in (1, 2, 3):
@@ -32,7 +38,7 @@ class ModelSpec:
 
 
 class ModelRegistry:
-    def __init__(self, models=()) -> None:
+    def __init__(self, models: Iterable[ModelSpec] = ()) -> None:
         self._models: dict[str, ModelSpec] = {}
         for model in models:
             self.register(model)
@@ -48,7 +54,7 @@ class ModelRegistry:
         except KeyError:
             raise NoModelError(f"unknown model: {name}") from None
 
-    def select(self, needs, *, risk: int = 1, max_cost_per_1k: float | None = None,
+    def select(self, needs: Iterable[str], *, risk: int = 1, max_cost_per_1k: float | None = None,
                max_latency_ms: int | None = None, min_context: int = 0) -> ModelSpec:
         """Return the cheapest model that meets every constraint.
 
