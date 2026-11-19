@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-QUESTIONS = {
+from typing import Any, Dict, List, Tuple
+
+QUESTIONS: Dict[str, List[Tuple[str, str]]] = {
     "model": [
         ("m1", "Every production model has a documented capability profile and risk clearance."),
         ("m2", "Model choice is routed by cost, latency, and risk, not hardcoded."),
@@ -24,9 +26,9 @@ QUESTIONS = {
 }
 
 
-def score(answers: dict) -> dict:
+def score(answers: Dict[str, Any]) -> Dict[str, Any]:
     """answers maps question id to bool. Unanswered counts as no."""
-    layers = {}
+    layers: Dict[str, Dict[str, Any]] = {}
     for layer, questions in QUESTIONS.items():
         yes = sum(1 for qid, _ in questions if answers.get(qid) is True)
         gaps = [text for qid, text in questions if answers.get(qid) is not True]
@@ -36,7 +38,7 @@ def score(answers: dict) -> dict:
     return {"overall": overall, "weakest": weakest, "layers": layers}
 
 
-def report(answers: dict) -> str:
+def report(answers: Dict[str, Any]) -> str:
     result = score(answers)
     lines = [f"# MAO diagnostic: {result['overall']}/100", ""]
     for layer, data in result["layers"].items():
