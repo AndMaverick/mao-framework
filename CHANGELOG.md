@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0
+
+Added:
+- `mao.live`: provider clients for Anthropic, OpenAI, DeepSeek, Moonshot (Kimi) and Gemini on the standard library. Usage is read from each response through the existing adapters and reported to the orchestrator for metering. Rate limits, overload, server errors and dropped connections are retried with backoff and `Retry-After`; other client errors are not. The API key is read from the environment, sent only in the request header, and never appears in an error, a log or the audit log. A response with no usage block is refused rather than metered as zero.
+- `examples/live_dispute_desk.py` and `docs/LIVE.md`: a governed dispute desk on a real model. It checks itself: metered cost must equal cost recomputed from per-call counts, the audit chain must verify, and the exit code says so. `calls.csv` carries each call's request id for matching against the provider's usage page.
+
 ## 0.4.0
 
 Added, the international layer:
