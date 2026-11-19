@@ -26,7 +26,7 @@ from .trace import Span, Tracer
 from .usage import MissingPrice, PriceBook, Usage
 from .vault import PromptVault
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 __all__ = [
     "compliance", "lingua", "sovereign",

@@ -1,0 +1,4 @@
+{
+  "_note": "Fill in from the provider's pricing page. Per million tokens, keyed by the exact model id you pass to --model.",
+  "YOUR-MODEL-ID": {"input_per_million": 0, "output_per_million": 0, "cached_input_per_million": 0, "cache_write_per_million": 0}
+}
