@@ -1,0 +1,27 @@
+# Changelog
+
+## 0.2.0
+
+Fixes (each was reproduced against 0.1 before the change):
+- An approver that raised crashed the run. It now denies, and the exception is logged.
+- A verifier that raised crashed the run. It now counts as a failed attempt.
+- Retries were charged once. Every attempt is now metered.
+- A caller could pass event fields named `seq`, `ts`, `event`, `prev` or `hash` and corrupt the chain. They are refused.
+- Rewriting the whole log, and truncating its tail, both verified as valid. Verification now accepts an external anchor (`head`, `length`) that detects both.
+- A side-effecting step was retried after an ambiguous failure. It now gets one attempt unless declared `idempotent`.
+
+Added:
+- `PriceBook`, `Usage`, exact decimal pricing, `MissingPrice` instead of silent guesses.
+- Provider usage adapters for Anthropic and OpenAI response shapes.
+- `mao export` and `write_usage_csv`, feeding Token Ledger.
+- `mao verify` and `mao export` commands.
+- `Verification` result with the failing index and reason.
+- Dispute-desk reference scenario with inspectable assumptions (synthetic).
+- Type hints throughout, `py.typed`, mypy strict and ruff in CI.
+
+Changed:
+- `ModelSpec` gains `provider`. `cost_per_1k` is documented as dollars per 1,000 tokens.
+
+## 0.1.0
+
+Initial release: model registry, policy, orchestrator, hash-chained audit log, diagnostic.
