@@ -1,7 +1,6 @@
 import unittest
 
-from mao import (Action, AuditLog, ModelRegistry, ModelSpec, NoModelError, Orchestrator,
-                 Policy, Step, score)
+from mao import Action, AuditLog, ModelRegistry, ModelSpec, NoModelError, Orchestrator, Policy, Step, score
 
 
 def registry():
@@ -138,7 +137,7 @@ class DiagnosticTests(unittest.TestCase):
         self.assertEqual(score({})["overall"], 0)
 
     def test_weakest_layer_identified(self):
-        answers = {q: True for q in ("m1", "m2", "m3", "m4", "o1", "o2", "o3", "o4")}
+        answers = dict.fromkeys(("m1", "m2", "m3", "m4", "o1", "o2", "o3", "o4"), True)
         result = score(answers)
         self.assertEqual(result["weakest"], "action")
         self.assertEqual(result["layers"]["model"]["score"], 100)
