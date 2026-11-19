@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Callable
+from typing import Any, Callable, FrozenSet
 
 
 @dataclass(frozen=True)
@@ -14,7 +14,7 @@ class Action:
     scope: str
     risk: int
     side_effects: bool
-    fn: Callable = field(compare=False, repr=False, default=lambda inputs: inputs)
+    fn: Callable[[Any], Any] = field(compare=False, repr=False, default=lambda inputs: inputs)
 
 
 @dataclass(frozen=True)
@@ -34,7 +34,7 @@ class Policy:
     """
 
     role: str
-    allowed_scopes: frozenset
+    allowed_scopes: FrozenSet[str]
     max_risk: int = 2
     approval_risk: int = 2
 
