@@ -12,7 +12,7 @@ Fixes (each was reproduced against 0.1 before the change):
 
 Added:
 - `PriceBook`, `Usage`, exact decimal pricing, `MissingPrice` instead of silent guesses.
-- Provider usage adapters for Anthropic and OpenAI response shapes.
+- Provider usage adapters for Anthropic, OpenAI, DeepSeek, Moonshot (Kimi) and Google Gemini response shapes, with a `usage_from(provider, response)` dispatcher. Each normalises cached input, cache writes and reasoning the same way, and refuses counts that contradict each other.
 - `mao export` and `write_usage_csv`, feeding Token Ledger.
 - `mao verify` and `mao export` commands.
 - `Verification` result with the failing index and reason.
