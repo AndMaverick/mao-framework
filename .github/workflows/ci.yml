@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # Python 3.9 is no longer provided on newer runner images
     strategy:
       fail-fast: false
       matrix:
