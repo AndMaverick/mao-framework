@@ -81,6 +81,7 @@ Every item here was a reproduced defect or a missing control in 0.1. See the [CH
 - `mao.guard` redacts personal data and scores prompt injection, with checksum-validated card and IBAN detection and Arabic and Persian digit handling. It is a heuristic filter, not a boundary, and plugs in as a step verifier.
 - `mao.trace` gives every run a span tree with cost attached to the step that incurred it. `mao.router` learns which permitted model earns its price on your traffic.
 - `mao.playbook` compiles markdown runbooks into plans with a critical path, and audits the plan's approval gates against the policy that will actually run. `mao.assure` holds eval suites, a regression gate that names the cases that flipped, drift statistics and an incident register with SLA tracking. `mao.context` packs retrieved chunks into a token budget. `mao.vault` versions prompts with gated deploys and an audit trail.
+- `mao.sovereign` checks data flows against residency rules you define, including derived classes and jurisdiction groups. `mao.lingua` normalises Arabic and Indonesian text, Gulf and rupiah amounts. `mao.compliance` scores EU AI Act, NIST AI RMF and GDPR controls from evidence, some of it taken from the audit log itself. Built for regulated deployments in the Gulf and Southeast Asia. Readiness aids, not legal advice.
 - `mao export` writes the usage record as a CSV that [Token Ledger](https://github.com/AndMaverick/token-ledger) can analyse.
 
 ## Reference scenario

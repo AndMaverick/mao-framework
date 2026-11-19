@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0
+
+Added, the international layer:
+- `mao.sovereign`: data residency checks. Rules by data class, jurisdiction groups (`GCC`), derived classes (a prompt carrying personal data obeys the personal data rule), unclassified data classes reported instead of treated as free, transitive reach, egress from a home jurisdiction, and a Markdown summary. It enforces the rules you supply and is not legal advice.
+- `mao.lingua`: Arabic normalisation (diacritics, tatweel, alef and yeh forms, Eastern digits and separators, optional teh marbuta), script profiling for routing mixed input, Gulf currency amounts in Latin and Arabic script, and Indonesian rupiah, slang, dates and phone numbers. Exact decimal arithmetic, and a missing currency is an error rather than a guess.
+- `mao.compliance`: governance controls for the EU AI Act, NIST AI RMF and GDPR as met, missing or failed with the evidence written down. `runtime_evidence` derives audit logging and human oversight from the verified audit log and the policy, so an empty or tampered log, or an approval gate that never fired, does not count. Bias metrics (parity gap, disparate impact ratio, groups too small to trust) are computed from outcomes. A readiness aid, not legal advice.
+
 ## 0.3.0
 
 Added:
