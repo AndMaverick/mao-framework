@@ -7,7 +7,7 @@ Most AI failures are not model failures. They happen in the seams: a model nobod
 ```
 python -m mao demo
 ok=True spend=6.2 outputs={'retrieve': [...], 'draft': 'summary of 2 files', 'publish': 'published'}
-audit entries=9 chain_valid=True
+audit entries=12 chain_valid=True head=9dd4123d4a356c22
 ```
 
 ## The three layers
@@ -69,17 +69,36 @@ python -m mao diagnose answers.json
 
 `answers.json` maps question ids (`m1` to `o4`, see `mao.QUESTIONS`) to `true` or `false`. Unanswered counts as no. The report names the weakest layer and lists every gap.
 
+## What 0.2 adds
+
+Every item here was a reproduced defect or a missing control in 0.1. See the [CHANGELOG](CHANGELOG.md).
+
+- An approver or verifier that raises is a denial or a failed attempt, never a crash.
+- Every attempt is metered, including failed ones, with exact decimal pricing from a price book you supply.
+- A side-effecting step is attempted once unless you declare it idempotent. Duplicate payments from retries after an ambiguous failure are the failure this prevents.
+- The audit log detects edits, deletions and reordering on its own, and detects full rewrites and truncation against a stored anchor.
+- `mao export` writes the usage record as a CSV that [Token Ledger](https://github.com/AndMaverick/token-ledger) can analyse.
+
+## Reference scenario
+
+`python examples/dispute_desk.py` runs a synthetic card dispute desk ungoverned and governed over the same 2,000 cases and the same faults, and prints every term of the comparison. Inputs are labelled synthetic, prices are illustrative, and each dollar follows from the `ASSUMPTIONS` table at the top of the file. Change an assumption and the result changes. It demonstrates the method. It is not evidence about any real institution.
+
+## Documentation
+
+[Architecture](docs/ARCHITECTURE.md) · [Threat model](docs/THREAT-MODEL.md) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Releasing](RELEASING.md)
+
 ## Tests
 
 ```
-python -m unittest discover -s tests -t . -v
+python -m unittest discover -s tests -t .
+ruff check . && mypy
 ```
 
-The suite covers model routing, policy decisions, audit tamper and deletion detection, dependency flow, approval fail-closed behavior, retry recovery, verification halts, budget enforcement, and cycle rejection. CI runs it on every push, along with the demo.
+75 tests, including adversarial ones that try to defeat each control: hostile approvers and verifiers, retry storms, tampered, truncated and rewritten logs, malformed entries, unpriceable usage, and formula injection in exports. CI runs Python 3.9 to 3.13, plus lint and strict type checking.
 
 ## Status
 
-Version 0.1. The core is small on purpose. Model and action implementations are yours to plug in through `Action.fn`, so the framework governs any provider or tool without depending on one.
+Version 0.2.0. Suitable for evaluation and for governing internal tooling where you review the scope and risk labels yourself. Not yet audited by a third party, and the provider adapters are tested against documented response shapes, not live API calls. The control plane contains no model or tool code: you supply that through `Action.fn`.
 
 ## Author
 
