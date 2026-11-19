@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0
+
+Added:
+- `mao.playbook`: markdown runbooks compile to plans. `Plan` gives order, parallel levels, total cost and critical path, binds to orchestrator `Step`s, and `Plan.audit` reports approval gates the plan declares but the policy will not enforce, gates the plan forgot, and steps the policy denies outright.
+- `mao.assure`: eval suites with range-checked scorers (a crashing system scores zero and is recorded), a regression `gate` that also names cases that flipped from pass to fail while the mean held, drift measurement (PSI, KS, categorical PSI) and an incident register with risk scoring, SLA breach detection, MTTR and postmortems.
+- `mao.context`: budgeted context packing with diversity weighting, pinned chunks and a pluggable token counter.
+- `mao.vault`: a versioned prompt store. Commits are idempotent, rollback appends rather than rewrites, deploys are gated, and every change is chained into the audit log.
+
 ## 0.2.0
 
 Fixes (each was reproduced against 0.1 before the change):
