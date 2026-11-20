@@ -88,7 +88,7 @@ Each item began as a defect reproduced against an earlier version or as a contro
 
 One agent reads text a stranger wrote. Another holds the tokens. What may pass between them?
 
-`mao.handoff` allows a label from a fixed list, a severity from a fixed list and bounded line numbers, sealed by trusted code and turned into an effect by the privileged side's own table. There is no field for text, so there is nowhere for a hidden instruction to ride. A reader steered into a wrong but admitted value is still possible, and [docs/HANDOFF.md](docs/HANDOFF.md) lists that and six other limits beside the guarantees. The tests run every admitted value through a real gate.
+A shorter version of the same idea, with eleven tests and nothing but `parse` and `plan`, is in [`examples/closed_values`](examples/closed_values). `mao.handoff` allows a label from a fixed list, a severity from a fixed list and bounded line numbers, sealed by trusted code and turned into an effect by the privileged side's own table. There is no field for text, so there is nowhere for a hidden instruction to ride. A reader steered into a wrong but admitted value is still possible, and [docs/HANDOFF.md](docs/HANDOFF.md) lists that and six other limits beside the guarantees. The tests run every admitted value through a real gate.
 
 ## Reference scenario
 
