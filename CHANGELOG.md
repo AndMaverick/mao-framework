@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+Added:
+- `mao.handoff`: a contract for passing a verdict from an agent that reads untrusted text to an agent that holds tools. The reader returns a label, a severity and line numbers from closed sets and nothing else. Trusted code seals the message with an HMAC tag, a nonce and a schema fingerprint. The privileged side verifies, looks the item up itself, derives the effect from its own routing table, asks the Policy, and logs closed values only. `docs/HANDOFF.md` states what it guarantees and what it does not, and `tests/test_handoff.py` runs every admitted value through a real gate.
+- `Action.owner` and `Policy(require_owner=True)`: a side effect with no named owner is denied. The default is unchanged.
+
 ## 0.5.0
 
 Added:

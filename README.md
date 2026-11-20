@@ -84,13 +84,19 @@ Every item here was a reproduced defect or a missing control in 0.1. See the [CH
 - `mao.sovereign` checks data flows against residency rules you define, including derived classes and jurisdiction groups. `mao.lingua` normalises Arabic and Indonesian text, Gulf and rupiah amounts. `mao.compliance` scores EU AI Act, NIST AI RMF and GDPR controls from evidence, some of it taken from the audit log itself. Built for regulated deployments in the Gulf and Southeast Asia. Readiness aids, not legal advice.
 - `mao export` writes the usage record as a CSV that [Token Ledger](https://github.com/AndMaverick/token-ledger) can analyse.
 
+## Handing work across a trust boundary
+
+One agent reads text a stranger wrote. Another holds the tokens. What may pass between them? `mao.handoff` answers with a label from a fixed list, a severity from a fixed list and bounded line numbers, sealed by trusted code and turned into an effect by the privileged side's own table. There is no field for text, so there is nothing for a hidden instruction to ride in. A wrong but admitted value is still possible, and `docs/HANDOFF.md` lists that and six other limits next to the guarantees. Every admitted value is run through a real gate in the tests.
+
 ## Reference scenario
 
 `python examples/dispute_desk.py` runs a synthetic card dispute desk ungoverned and governed over the same 2,000 cases and the same faults, and prints every term of the comparison. Inputs are labelled synthetic, prices are illustrative, and each dollar follows from the `ASSUMPTIONS` table at the top of the file. Change an assumption and the result changes. It demonstrates the method. It is not evidence about any real institution.
 
 ## Documentation
 
-[Architecture](docs/ARCHITECTURE.md) · [Threat model](docs/THREAT-MODEL.md) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Releasing](RELEASING.md)
+[Architecture](docs/ARCHITECTURE.md) · [Threat model](docs/THREAT-MODEL.md) · [Handoff contract](docs/HANDOFF.md) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Releasing](RELEASING.md)
+
+**Read the thinking:** [The MAO Framework: How CFOs Should Actually Think About Enterprise AI](https://blog.andmaverick.com/the-mao-framework-how-cfos-should-actually-think-about-enterprise-ai) for the architecture, [Nobody Signs for the Agent](https://blog.andmaverick.com/nobody-signs-for-the-agent) for why an agent needs a named owner, and [The Lethal Trifecta Test for Your Agent](https://coderlegion.com/34412/the-lethal-trifecta-test-for-your-agent) for the split that the handoff contract implements.
 
 ## Tests
 
@@ -99,7 +105,7 @@ python -m unittest discover -s tests -t .
 ruff check . && mypy
 ```
 
-185 tests, including adversarial ones that try to defeat each control: hostile approvers and verifiers, retry storms, tampered, truncated and rewritten logs, malformed entries, unpriceable usage, and formula injection in exports. CI runs Python 3.9 to 3.13, plus lint and strict type checking.
+250 tests, including adversarial ones that try to defeat each control: hostile approvers and verifiers, retry storms, tampered, truncated and rewritten logs, malformed entries, unpriceable usage, and formula injection in exports. CI runs Python 3.9 to 3.13, plus lint and strict type checking.
 
 ## Status
 
