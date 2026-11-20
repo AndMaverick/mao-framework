@@ -98,7 +98,7 @@ One agent reads text a stranger wrote. Another holds the tokens. What may pass b
 
 [Architecture](docs/ARCHITECTURE.md) · [Threat model](docs/THREAT-MODEL.md) · [Handoff contract](docs/HANDOFF.md) · [Running live](docs/LIVE.md) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Releasing](RELEASING.md)
 
-**Read the thinking.** [The MAO Framework: How CFOs Should Actually Think About Enterprise AI](https://blog.andmaverick.com/the-mao-framework-how-cfos-should-actually-think-about-enterprise-ai) sets out the three layers. [Nobody Signs for the Agent](https://blog.andmaverick.com/nobody-signs-for-the-agent) argues that every agent needs a named owner. [The Lethal Trifecta Test for Your Agent](https://coderlegion.com/34412/the-lethal-trifecta-test-for-your-agent) describes the split that the handoff contract builds.
+**Read the thinking.** [The MAO Framework: How CFOs Should Actually Think About Enterprise AI](https://blog.andmaverick.com/the-mao-framework-how-cfos-should-actually-think-about-enterprise-ai) sets out the three layers. [Before Your Agent Touches Production, Give It an Owner](https://coderlegion.com/33962/before-your-agent-touches-production-give-it-an-owner) and [Nobody Signs for the Agent](https://blog.andmaverick.com/nobody-signs-for-the-agent) argue that every agent needs a named owner, which `Action.owner` and `Policy(require_owner=True)` enforce. [The Lethal Trifecta Test for Your Agent](https://coderlegion.com/34412/the-lethal-trifecta-test-for-your-agent) and [Closed Values: Hand Off Contracts for Untrusted Agents](https://coderlegion.com/35393/closed-values-hand-off-contracts-for-untrusted-agents) describe the split that the handoff contract builds.
 
 ## Tests
 
