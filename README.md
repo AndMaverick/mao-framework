@@ -1,8 +1,10 @@
 # mao-framework
 
-**Model, Action, Orchestration.** A small, dependency-free Python framework for building AI systems that can be governed, audited, and trusted with real work.
+**Model, Action, Orchestration.** A dependency free Python framework that decides whether an AI system may do something before it does it, and keeps evidence of what it did.
 
-Most AI failures are not model failures. They happen in the seams: a model nobody cleared for the risk, a tool with more permission than it needed, a pipeline with no check between steps. MAO makes each of those a first-class object you can test.
+In July 2025 an AI coding agent on Replit deleted a live production database during a code freeze. It had been told, repeatedly, to change nothing. The model made the call and the architecture let it, because nothing stood between the plan and the delete.
+
+MAO is the part that stands there. Every step names what it needs, what it may touch and how much damage it could do. A policy answers before the step runs. A check on the output comes before anything downstream depends on it. Every decision lands in a log that breaks if anyone edits it afterwards.
 
 ```
 python -m mao demo
@@ -12,19 +14,21 @@ audit entries=12 chain_valid=True head=9dd4123d4a356c22
 
 ## The three layers
 
+A model nobody cleared for the risk, a tool with more permission than it needed, a pipeline with no check between steps: those are three different failures, so they get three layers that can each be tested alone.
+
 | Layer | What it owns | Module |
 |---|---|---|
-| **Model** | Capability, cost, latency, and the maximum risk a model is cleared for. Routing picks the cheapest model that qualifies. | `mao.model` |
-| **Action** | What the system may do. Every action carries a scope, a risk rating, and a side-effect flag. A policy decides before anything runs. | `mao.action` |
-| **Orchestration** | Plans as dependency graphs. Every step is routed, gated, executed, verified, and logged. | `mao.orchestrator`, `mao.audit` |
+| **Model** | Capability, cost, latency, and the highest risk a model is cleared for. Routing picks the cheapest model that qualifies. | `mao.model` |
+| **Action** | What the system may do. Every action carries a scope, a risk rating, a side effect flag and, if you ask for it, a named owner. A policy decides before anything runs. | `mao.action` |
+| **Orchestration** | Plans as dependency graphs. Every step is routed, gated, executed, verified and logged. | `mao.orchestrator`, `mao.audit` |
 
 ## Design rules
 
-1. **Fail closed.** A step that needs human approval with no approver is denied, not waved through.
-2. **Verify before you depend.** A step's output must pass its check before any downstream step sees it.
-3. **Bound everything.** Retries and spend are capped per run. Cycles and unknown dependencies are rejected before execution.
-4. **Leave evidence.** Every gate decision, approval, retry, and halt lands in a hash-chained audit log. Editing or deleting any entry breaks verification.
-5. **Be boring to deploy.** Standard library only. No network, no hidden state, deterministic model selection.
+1. **Fail closed.** A step that needs a human and has no approver is denied. An approver that raises is a denial.
+2. **Verify before you depend.** A step's output has to pass its check before any later step sees it.
+3. **Bound everything.** Retries and spend are capped per run. Cycles and unknown dependencies are rejected before anything executes.
+4. **Leave evidence.** Every gate decision, approval, retry and halt goes into a hash chained audit log. Editing or deleting one entry breaks verification at that entry.
+5. **Be boring to deploy.** The core is the standard library, with no network and no hidden state. `mao.live` is the one module that opens connections, and only when you call it.
 
 ## Quickstart
 
@@ -61,42 +65,40 @@ assert audit.verify()
 
 ## The diagnostic
 
-Score an existing system against twelve concrete questions, four per layer, and find the layer where it will fail first.
+Twelve concrete questions, four per layer, show where an existing system will fail first.
 
 ```
 python -m mao diagnose answers.json
 ```
 
-`answers.json` maps question ids (`m1` to `o4`, see `mao.QUESTIONS`) to `true` or `false`. Unanswered counts as no. The report names the weakest layer and lists every gap.
+`answers.json` maps question ids (`m1` to `o4`, listed in `mao.QUESTIONS`) to `true` or `false`. An unanswered question counts as no. The report names the weakest layer and lists every gap.
 
-## What 0.2 adds
+## What else is in the box
 
-Every item here was a reproduced defect or a missing control in 0.1. See the [CHANGELOG](CHANGELOG.md).
+Each item began as a defect reproduced against an earlier version or as a control the earlier version lacked. The [changelog](CHANGELOG.md) has the history.
 
-- An approver or verifier that raises is a denial or a failed attempt, never a crash.
-- Every attempt is metered, including failed ones, with exact decimal pricing from a price book you supply.
-- A side-effecting step is attempted once unless you declare it idempotent. Duplicate payments from retries after an ambiguous failure are the failure this prevents.
-- The audit log detects edits, deletions and reordering on its own, and detects full rewrites and truncation against a stored anchor.
-- Usage adapters for Anthropic, OpenAI, DeepSeek, Moonshot (Kimi) and Google Gemini, so spend is counted the same way whichever lab served the call.
-- `mao.guard` redacts personal data and scores prompt injection, with checksum-validated card and IBAN detection and Arabic and Persian digit handling. It is a heuristic filter, not a boundary, and plugs in as a step verifier.
-- `mao.trace` gives every run a span tree with cost attached to the step that incurred it. `mao.router` learns which permitted model earns its price on your traffic.
-- `mao.playbook` compiles markdown runbooks into plans with a critical path, and audits the plan's approval gates against the policy that will actually run. `mao.assure` holds eval suites, a regression gate that names the cases that flipped, drift statistics and an incident register with SLA tracking. `mao.context` packs retrieved chunks into a token budget. `mao.vault` versions prompts with gated deploys and an audit trail.
-- `mao.sovereign` checks data flows against residency rules you define, including derived classes and jurisdiction groups. `mao.lingua` normalises Arabic and Indonesian text, Gulf and rupiah amounts. `mao.compliance` scores EU AI Act, NIST AI RMF and GDPR controls from evidence, some of it taken from the audit log itself. Built for regulated deployments in the Gulf and Southeast Asia. Readiness aids, not legal advice.
-- `mao export` writes the usage record as a CSV that [Token Ledger](https://github.com/AndMaverick/token-ledger) can analyse.
+- **Failures that used to crash a run.** An approver or verifier that raises is a denial or a failed attempt. A side effecting step is attempted once unless you declare it idempotent, which is what prevents a duplicate payment after an ambiguous failure.
+- **Money.** Every attempt is metered, failed ones included, in exact decimals from a price book you supply. Adapters read usage from Anthropic, OpenAI, DeepSeek, Moonshot (Kimi) and Gemini, so spend is counted one way whichever lab served the call. `mao export` writes a CSV that [Token Ledger](https://github.com/AndMaverick/token-ledger) can analyse. `mao.live` calls the five providers on the standard library, retries what is worth retrying and never writes the key into an error or a log.
+- **Evidence.** The audit log catches edits, deletions and reordering by itself. A full rewrite or a cut tail is caught against an anchor you store elsewhere. `mao.trace` attaches cost to the span that incurred it. `mao.router` learns which permitted model earns its price on your traffic.
+- **Text going in.** `mao.guard` redacts personal data and scores prompt injection, with checksum validated card numbers and IBANs and Arabic and Persian digits handled. It is a heuristic filter, not a boundary, and says so at the top of the file.
+- **Operating the system.** `mao.playbook` compiles markdown runbooks into plans and audits their approval gates against the policy that will run. `mao.assure` holds eval suites, a regression gate that names the cases that flipped while the average held, drift statistics and an incident register. `mao.context` packs retrieved chunks into a token budget. `mao.vault` versions prompts behind gated deploys.
+- **Regions.** `mao.sovereign` checks data flows against residency rules you write, including derived classes and jurisdiction groups. `mao.lingua` normalises Arabic and Indonesian text and Gulf and rupiah amounts. `mao.compliance` scores EU AI Act, NIST AI RMF and GDPR controls from evidence, some of it read from the audit log itself. They are readiness aids and not legal advice.
 
 ## Handing work across a trust boundary
 
-One agent reads text a stranger wrote. Another holds the tokens. What may pass between them? `mao.handoff` answers with a label from a fixed list, a severity from a fixed list and bounded line numbers, sealed by trusted code and turned into an effect by the privileged side's own table. There is no field for text, so there is nothing for a hidden instruction to ride in. A wrong but admitted value is still possible, and `docs/HANDOFF.md` lists that and six other limits next to the guarantees. Every admitted value is run through a real gate in the tests.
+One agent reads text a stranger wrote. Another holds the tokens. What may pass between them?
+
+`mao.handoff` allows a label from a fixed list, a severity from a fixed list and bounded line numbers, sealed by trusted code and turned into an effect by the privileged side's own table. There is no field for text, so there is nowhere for a hidden instruction to ride. A reader steered into a wrong but admitted value is still possible, and [docs/HANDOFF.md](docs/HANDOFF.md) lists that and six other limits beside the guarantees. The tests run every admitted value through a real gate.
 
 ## Reference scenario
 
-`python examples/dispute_desk.py` runs a synthetic card dispute desk ungoverned and governed over the same 2,000 cases and the same faults, and prints every term of the comparison. Inputs are labelled synthetic, prices are illustrative, and each dollar follows from the `ASSUMPTIONS` table at the top of the file. Change an assumption and the result changes. It demonstrates the method. It is not evidence about any real institution.
+`python examples/dispute_desk.py` runs a synthetic card dispute desk twice, ungoverned and governed, over the same 2,000 cases and the same faults, and prints every term of the comparison. The inputs are labelled synthetic, the prices are illustrative, and each dollar follows from the `ASSUMPTIONS` table at the top of the file. Change an assumption and the result changes. It demonstrates a method and is not evidence about any real institution.
 
 ## Documentation
 
-[Architecture](docs/ARCHITECTURE.md) · [Threat model](docs/THREAT-MODEL.md) · [Handoff contract](docs/HANDOFF.md) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Releasing](RELEASING.md)
+[Architecture](docs/ARCHITECTURE.md) · [Threat model](docs/THREAT-MODEL.md) · [Handoff contract](docs/HANDOFF.md) · [Running live](docs/LIVE.md) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Releasing](RELEASING.md)
 
-**Read the thinking:** [The MAO Framework: How CFOs Should Actually Think About Enterprise AI](https://blog.andmaverick.com/the-mao-framework-how-cfos-should-actually-think-about-enterprise-ai) for the architecture, [Nobody Signs for the Agent](https://blog.andmaverick.com/nobody-signs-for-the-agent) for why an agent needs a named owner, and [The Lethal Trifecta Test for Your Agent](https://coderlegion.com/34412/the-lethal-trifecta-test-for-your-agent) for the split that the handoff contract implements.
+**Read the thinking.** [The MAO Framework: How CFOs Should Actually Think About Enterprise AI](https://blog.andmaverick.com/the-mao-framework-how-cfos-should-actually-think-about-enterprise-ai) sets out the three layers. [Nobody Signs for the Agent](https://blog.andmaverick.com/nobody-signs-for-the-agent) argues that every agent needs a named owner. [The Lethal Trifecta Test for Your Agent](https://coderlegion.com/34412/the-lethal-trifecta-test-for-your-agent) describes the split that the handoff contract builds.
 
 ## Tests
 
@@ -105,18 +107,14 @@ python -m unittest discover -s tests -t .
 ruff check . && mypy
 ```
 
-250 tests, including adversarial ones that try to defeat each control: hostile approvers and verifiers, retry storms, tampered, truncated and rewritten logs, malformed entries, unpriceable usage, and formula injection in exports. CI runs Python 3.9 to 3.13, plus lint and strict type checking.
+250 tests, many of them adversarial: hostile approvers and verifiers, retry storms, tampered, truncated and rewritten logs, malformed entries, unpriceable usage, formula injection in exports and a hundred admitted handoff values. CI runs Python 3.9 to 3.13, plus lint and strict type checking.
 
 ## Status
 
-Version 0.2.0. Suitable for evaluation and for governing internal tooling where you review the scope and risk labels yourself. Not yet audited by a third party, and the provider adapters are tested against documented response shapes, not live API calls. The control plane contains no model or tool code: you supply that through `Action.fn`.
+Version 0.5.0. Fit for evaluation, and for governing internal tooling where you review the scope and risk labels yourself, because a payment marked `risk=1, side_effects=False` bypasses the policy. Not audited by a third party. The provider adapters are tested against documented response shapes and `mao.live` against a local server that speaks each wire format. Neither has been run against a real provider account in this repository's CI. The control plane contains no model or tool code: you supply that through `Action.fn`.
 
 ## Author
 
 Built by [AndMaverick](https://www.andmaverick.com). MIT licensed.
 
----
-
-**Related reading:** [Nobody Signs for the Agent](https://blog.andmaverick.com/nobody-signs-for-the-agent?utm_source=github&utm_medium=repo&utm_campaign=mao-framework)
-
-**If this is your problem.** If a system you run can fail in ways that matter, the controls belong in the architecture, not in the postmortem. I am happy to talk through yours. [Begin a conversation](https://calendly.com/andmaverick?utm_source=github&utm_medium=repo&utm_campaign=mao-framework).
+If a system you run can fail in ways that matter, the controls belong in the architecture and not in the postmortem. I am glad to talk through yours: [begin a conversation](https://calendly.com/andmaverick?utm_source=github&utm_medium=repo&utm_campaign=mao-framework).
