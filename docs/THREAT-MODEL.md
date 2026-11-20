@@ -20,12 +20,14 @@ Scope: the control plane in this repository. MAO decides whether a step may run,
 | Editing or deleting one log entry | Hash chain breaks at that entry, and reports its index | `test_adversarial` |
 | Rewriting the whole log, or cutting off the tail | Not detectable from the log alone. Detected against an externally stored anchor | `test_adversarial` |
 | Spreadsheet formula injection through exported text | Leading `= + - @` neutralised on export | `test_usage` |
+| Text from an outsider reaches an agent that holds tools | The handoff contract: the reader returns closed values only, trusted code seals them, and the privileged side derives the effect from its own table and asks the Policy. Guarantees and limits in `docs/HANDOFF.md` | `test_handoff` |
+| An agent with side effects and no accountable person | `Policy(require_owner=True)` denies a side effect that names no owner | `test_handoff` |
 
 ## Out of scope, stated plainly
 
 - **A compromised host.** Whoever controls the process can write any log they like. Store anchors off the host.
 - **Mislabelled actions.** Marking a payment `risk=1, side_effects=False` bypasses the policy. Review labels like code.
-- **Prompt injection inside a step.** MAO limits what an injected step may do (scope, risk, approval). It does not detect injection.
+- **Prompt injection inside a step.** MAO limits what an injected step may do (scope, risk, approval). It does not detect injection. The handoff contract goes further for the one case it covers, a reader of untrusted text, and says in `docs/HANDOFF.md` what it still does not prevent: a wrong but admitted value, a pointer into untrusted content, a harness that pairs the wrong item with a verdict.
 - **Provider billing.** The metered cost is computed from reported tokens and the prices you supply. Reconcile it to the invoice with Token Ledger.
 - **Concurrency.** `AuditLog` is not thread-safe. One log per run, or serialise access.
 - **Confidentiality.** Audit entries contain whatever you pass in. Do not log secrets or raw personal data.
